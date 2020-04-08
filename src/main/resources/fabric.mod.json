@@ -9,7 +9,7 @@
   "description": "Your options shall be respected.",
   "authors": ["shedaniel"],
   "entrypoints": {
-    "main": [
+    "preLaunch": [
       "me.shedaniel.yosbr.YourOptionsShallBeRespected"
     ]
   },

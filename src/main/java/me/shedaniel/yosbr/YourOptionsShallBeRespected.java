@@ -1,8 +1,7 @@
 package me.shedaniel.yosbr;
 
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
+import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,13 +10,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 
-public class YourOptionsShallBeRespected implements ModInitializer {
+public class YourOptionsShallBeRespected implements PreLaunchEntrypoint {
     public static final Logger LOGGER = LogManager.getLogger("YOSBR");
-    public static final File RUN_DIR = MinecraftClient.getInstance().runDirectory;
+    public static final File RUN_DIR = FabricLoader.getInstance().getGameDirectory();
     public static final File CONFIG_DIR = FabricLoader.getInstance().getConfigDirectory();
     
+    /**
+     * We are using pre-launch entrypoint here as we want to be faster than everyone.
+     */
     @Override
-    public void onInitialize() {
+    public void onPreLaunch() {
         try {
             File yosbr = new File(CONFIG_DIR, "yosbr");
             if (!yosbr.exists() && !yosbr.mkdirs()) {
