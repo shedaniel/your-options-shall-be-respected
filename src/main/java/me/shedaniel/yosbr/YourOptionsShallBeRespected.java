@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 
 public class YourOptionsShallBeRespected implements PreLaunchEntrypoint {
@@ -31,16 +32,19 @@ public class YourOptionsShallBeRespected implements PreLaunchEntrypoint {
                 throw new IllegalStateException("Could not create directory: " + config.getAbsolutePath());
             }
             Files.walk(yosbr.toPath()).forEach(path -> {
-                File file = path.toAbsolutePath().toFile();
+                File file = path.normalize().toAbsolutePath().normalize().toFile();
                 if (!file.isFile()) return;
                 try {
-                    if (file.getAbsolutePath().startsWith(config.getAbsolutePath())) {
-                        String name = file.getAbsolutePath().replace(config.getAbsolutePath() + "/", "/");
-                        if (name.startsWith("yosbr/"))
+                    try {
+                        Path configRelative = config.toPath().toAbsolutePath().normalize().relativize(file.toPath().toAbsolutePath().normalize());
+                        if (configRelative.startsWith("yosbr"))
                             throw new IllegalStateException("Illegal default config file: " + file);
-                        applyDefaultOptions(new File(CONFIG_DIR, name), file);
-                    } else {
-                        applyDefaultOptions(new File(RUN_DIR, file.getAbsolutePath().replace(yosbr.getAbsolutePath() + "/", "/")), file);
+                        applyDefaultOptions(new File(CONFIG_DIR, configRelative.normalize().toString()), file);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(yosbr.toPath().toAbsolutePath().normalize());
+                        System.out.println(file.toPath().toAbsolutePath().normalize());
+                        System.out.println(yosbr.toPath().toAbsolutePath().normalize().relativize(file.toPath().toAbsolutePath().normalize()));
+                        applyDefaultOptions(new File(RUN_DIR, yosbr.toPath().toAbsolutePath().normalize().relativize(file.toPath().toAbsolutePath().normalize()).normalize().toString()), file);
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -63,8 +67,8 @@ public class YourOptionsShallBeRespected implements PreLaunchEntrypoint {
             return;
         }
         if (file.exists()) return;
-        LOGGER.info("Applying default options for /" + RUN_DIR.toPath().relativize(file.toPath()).toString() + " from /" +
-                    RUN_DIR.toPath().relativize(defaultFile.toPath()).toString());
+        LOGGER.info("Applying default options for " + File.separator + RUN_DIR.toPath().toAbsolutePath().normalize().relativize(file.toPath().toAbsolutePath().normalize()).normalize().toString() + " from " + File.separator +
+                    RUN_DIR.toPath().toAbsolutePath().normalize().relativize(defaultFile.toPath().toAbsolutePath().normalize()).normalize().toString());
         Files.copy(defaultFile.toPath(), file.toPath());
     }
 }
