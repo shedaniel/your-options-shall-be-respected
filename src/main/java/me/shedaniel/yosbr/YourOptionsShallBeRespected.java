@@ -23,9 +23,9 @@ public class YourOptionsShallBeRespected implements PreLaunchEntrypoint {
             try (var walk = Files.walk(YOSBR_PATH).skip(1)) {
                 walk.forEach(path -> {
                     try {
-                        var root_path = FabricLoader.getInstance().getGameDir().resolve(YOSBR_PATH.relativize(path).toString());
-
                         if (Files.isRegularFile(path)) {
+                            var root_path = FabricLoader.getInstance().getGameDir().resolve(YOSBR_PATH.relativize(path).toString());
+
                             if (Files.notExists(root_path)) {
                                 var parent = root_path.getParent();
                                 if (Files.notExists(parent)) {
