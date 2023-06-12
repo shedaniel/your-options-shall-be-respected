@@ -1,7 +1,9 @@
 package me.shedaniel.yosbr;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
+import net.fabricmc.loader.api.LanguageAdapter;
+import net.fabricmc.loader.api.LanguageAdapterException;
+import net.fabricmc.loader.api.ModContainer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,7 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 
-public class YourOptionsShallBeRespected implements PreLaunchEntrypoint {
+public class YourOptionsShallBeRespected implements LanguageAdapter {
     public static final Logger LOGGER = LogManager.getLogger("YOSBR");
     public static final File RUN_DIR = FabricLoader.getInstance().getGameDirectory();
     public static final File CONFIG_DIR = FabricLoader.getInstance().getConfigDirectory();
@@ -19,8 +21,8 @@ public class YourOptionsShallBeRespected implements PreLaunchEntrypoint {
     /**
      * We are using pre-launch entrypoint here as we want to be faster than everyone.
      */
-    @Override
-    public void onPreLaunch() {
+    public YourOptionsShallBeRespected() {
+        LOGGER.info("Applying default options... (YOSBR)");
         try {
             File yosbr = new File(CONFIG_DIR, "yosbr");
             if (!yosbr.exists() && !yosbr.mkdirs()) {
@@ -70,5 +72,10 @@ public class YourOptionsShallBeRespected implements PreLaunchEntrypoint {
         LOGGER.info("Applying default options for " + File.separator + RUN_DIR.toPath().toAbsolutePath().normalize().relativize(file.toPath().toAbsolutePath().normalize()).normalize().toString() + " from " + File.separator +
                     RUN_DIR.toPath().toAbsolutePath().normalize().relativize(defaultFile.toPath().toAbsolutePath().normalize()).normalize().toString());
         Files.copy(defaultFile.toPath(), file.toPath());
+    }
+    
+    @Override
+    public <T> T create(ModContainer mod, String value, Class<T> type) throws LanguageAdapterException {
+        throw new IllegalStateException();
     }
 }

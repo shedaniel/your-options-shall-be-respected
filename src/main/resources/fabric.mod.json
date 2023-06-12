@@ -3,15 +3,13 @@
   "id": "yosbr",
   "version": "${version}",
   "name": "YOSBR",
-  "license": "CC-BY-NC-4.0",
+  "license": "LGPL-3.0-only",
   "icon": "assets/yosbr/icon.png",
   "environment": "*",
   "description": "Your options shall be respected.",
   "authors": ["shedaniel"],
-  "entrypoints": {
-    "preLaunch": [
-      "me.shedaniel.yosbr.YourOptionsShallBeRespected"
-    ]
+  "languageAdapters": {
+    "fake_yosbr": "me.shedaniel.yosbr.YourOptionsShallBeRespected"
   },
   "depends": {
     "fabricloader": ">=0.7.8+build.189"
